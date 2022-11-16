@@ -1,6 +1,7 @@
 ---
-title: "PEC1_Omicas"
+title: "PEC1. Análisis de datos Ómicos"
 author: "Lára Kristjánsdóttir"
+date: "16/11/2022"
 output:
   html_document:
     code_folding: show
@@ -32,57 +33,44 @@ library(BiocManager)
 library(GEOquery)
 ```
 
-```{r, echo = FALSE, include = FALSE}
-
-
-# https://www.ncbi.nlm.nih.gov/sites/GDSbrowser?acc=GDS1736
-# https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE3737
-
-```
-
 
 # Introducción y objetivos
-En este trabajo haremos un  del dataset de "Arachidonic acid effect on prostate cancer cells. Determinaremos su estructura y el diseño del estudio que los generado, analisis exploratorio univariante y multivariante. 
 
-Hemos seleccionado el dataset ". Es un 
-Homo sapiens
-
-GEOserie GSE3737
-
-GEOdataset GDS1736
-
-## basic info del estudio
-Status 	Public on Jan 01, 2006
-Title 	Omega-6 fatty acids, arachidonic acid (AA) activates PI3K signaling and induces gene expression in prostate cancer
-Organism 	Homo sapiens
-
-gene chip analsisi
+En este trabajo haremos una exploración del estudio "Arachidonic acid effect on prostate cancer cells". Determinaremos su estructura y el diseño y luego exploramos los datos y hacemos análisis univariante y multivariante. 
 
 
-summary: 
-Analysis of PC-3 prostate cancer cells incubated with arachidonic acid (AA). AA is an omega-6 fatty acid shown to induce cancer cell proliferation. Results suggest AA plays an important role in stimulation of growth-related genes and proliferation via phosphatidylinositol 3-kinase (PI3K) signaling.
+## Información básica del estudio
 
-citation:     Hughes-Fulford M, Li CF, Boonyaratanakornkit J, Sayyah S. Arachidonic acid activates phosphatidylinositol 3-kinase signaling and induces gene expression in prostate cancer. Cancer Res 2006 Feb 1;66(3):1427-33. PMID: 16452198
+Podemos ver el estudio "Omega-6 fatty acids, arachidonic acid (AA) activates PI3K signaling and induces gene expression in prostate cancer"  mediante el GEOdataset o la GEOserie: 
 
-## estructura y diseño 
+[GEOdataset GDS1736](https://www.ncbi.nlm.nih.gov/sites/GDSbrowser?acc=GDS1736)
+
+[GEOserie GSE3737](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE3737)
+
+Fue publicado el 1 de enero de 2006 por Hughes-Fulford M, Li CF, Boonyaratanakornkit J, Sayyah S..
+
+Consistió en analizar cultivos de células de cáncer de próstata en humanos utilizando ácido araquidónico, un ácido que ha demostrado ser importante en la proliferación de células cancerígenas. 
 
 
-Experiment type: 	Expression profiling by array
+## Estructura y diseño 
 
-Overall design: 	PC-3 prostate cancer cells were incubated with 5 µg/mL AA in RPMI containing 0.25 mg/mL albumin for 2hr. Control cells were treated with albumin alone and remained unactivated. Total RNA was isolated and relative gene expression was analyzed by Affymetrix gene arrays and then verified by qRTPCR. Microarrays for untreated and treated samples were done in quadruplicates. 
+El experimento fue de tipo "Expression profiling by array" se realizó de la siguente manera:
+
+"PC-3 prostate cancer cells were incubated with 5 µg/mL AA in RPMI containing 0.25 mg/mL albumin for 2hr. Control cells were treated with albumin alone and remained unactivated. Total RNA was isolated and relative gene expression was analyzed by Affymetrix gene arrays and then verified by qRTPCR. Microarrays for untreated and treated samples were done in quadruplicates." 
 
 # Métodos
 
+## Exploración de los datos
 Empezamos descargando la información del experimento con `GEOquery` con la función `getGEO()`. 
-```{r, echo = FALSE}
+```{r data, echo = FALSE}
 # Loading data with GEOquery
 
 gse <- getGEO("GSE3737", GSEMatrix=TRUE, AnnotGPL=TRUE) # a list, each of which elements is an expressionSet
 gds <- getGEO("GDS1736") # A class comprised of a metadata header and a GEODataTable
 ```
 
-Veamos el objecto de "gse" y el Expression set que se crea automaticamente.
-```{r, echo = FALSE }
+Veamos el objeto de "gse" y el "Expression set" que se crea automáticamente.
+```{r info_data_gse, echo = FALSE }
 # Información la lista gse3737
 
 class(gse)
@@ -94,7 +82,7 @@ esetFromGEO <- gse[[1]]
 ```
 Veamos el objeto "gds" y creamos el Expression Set. 
 
-```{r, echo = FALSE}
+```{r info_data_gds, echo = FALSE}
 # Information on the gds class and turn gds class into expression set
 
 class(gds)
@@ -102,49 +90,116 @@ slotNames(gds)
 eset <- GDS2eSet(gds,do.log2=FALSE)
 
 ```
-Ahora exploramos el Expression set. Empezamos con el viendo  con la información de los genes. ATH sjá hvad fData gerir!!
-```{r, echo = FALSE}
+
+Ahora exploramos el Expression set. Empezamos con la información de los genes.
+```{r info_gene, echo = FALSE}
 # Information about the genes
 
 colnames(fData(esetFromGEO))
 
 ```
-Luego vemos los datos de la expresion genética y la información phenotípica. De la información phenotípica, puedemos por ejemplo ver a que grupo pertenece cada observación.
-```{r, echo = FALSE}
+Luego vemos los datos de la expresión genética y la información fenotípica. 
+```{r expression_data, echo = FALSE}
 # Gene expression data
 
 head(exprs(eset)) 
 ```
+De la información fenotípica, podemos por ejemplo ver a qué grupo pertenece cada observación.
 
-
-```{r, echo = FALSE}
+```{r info_phenotipic, echo = FALSE}
 # phenotipic information
 
-head(pData(eset)) 
+pData(eset) 
 ```
 
-Exploramos la matriz de expresión para familiarizarnos con el dataset, viendo las dimesiones y los nombres de las columnas. 
+Exploramos la matriz de expresión para familiarizarnos con el dataset, viendo las dimensiones y los nombres de las columnas. 
 
-```{r, echo=TRUE}
+```{r dimensions_colnames, echo=FALSE}
+# Exploring data
 
-expression_matrix <- exprs(eset)
-dim(expression_matrix)      # Dimensions
-colnames(expression_matrix)    # Vector of strings to name the columns
+x <- exprs(eset)
+dim(x)      # Dimensions
+colnames(x)    # Vector of strings to name the columns
 ```
-Ahora
-```{r}
+Ahora vemos el resumen estadístico.
+```{r summary, echo = FALSE}
 # summarizing  data
 
+round(apply(x,2, summary))  
+
 ```
 
-```{r}
-# visualizing dataset
+## Análisis estadístico univariante
 
+Hacemos un histograma para cada columna y vemos si existe una asimetría entre los datos.
+
+```{r histogram_columns, echo=FALSE}
+# Visualizing dataset
+
+# Histogram
+opt <- par(mfrow=c(3,3))
+for (i in 1:ncol(x))
+  hist(x[,i], main = names(x)[i])
+par(opt)
+
+```
+Para ver mejor si hay asimetría hacemos un boxplot con todas las muestras y pintamos los grupos de distintos colores.
+
+```{r boxplot, echo= FALSE}
+# Boxplot expression value
+
+groupColors <- c(rep("red", 4), rep("blue", 4))
+boxplot(x, col=groupColors, main="Valores de expresion para\n 8 muestras, dos grupos",
+    xlab="Slides",
+    ylab="Expression", las=2, cex.axis=0.7, cex.main=0.7)
+
+```
+
+De la gráfica se puede sacar poca información, así que hacemos el boxplot de nuevo con el logaritmo de los valores de expresión. 
+
+```{r boxplot_Log, echo=FALSE}
+# Boxplot Log expression value
+
+logX <- log2(x)
+groupColors <- c(rep("red", 4), rep("blue", 4))
+boxplot(logX, col=groupColors, main="log Valores de expresion para\n 8 muestras, dos grupos",
+    xlab="Slides",
+    ylab="logExpression", las=2, cex.axis=0.7, cex.main=0.7)
+```
+
+## Visualización multivariante de los datos
+
+Para ver si exsisten valores atípicos, hacemos una gráfica donde calculamos "sample-wise" los componentes principales y luego dibujamos los primeros componentes. Empezamos calculando los componentes principales y las cargas.
+```{r pca, echo = FALSE}
+# PCA
+
+pcX<-prcomp(t(logX), scale=FALSE) # Ya se han escalado los datos
+loads<- round(pcX$sdev^2/sum(pcX$sdev^2)*100,1)
+```
+
+Luego dibujamos las dos primeras componentes.
+
+```{r plotPCA, echo = FALSE}
+# Plot PCA
+xlab<-c(paste("PC1",loads[1],"%"))
+ylab<-c(paste("PC2",loads[2],"%"))
+names2plot<-paste0(substr(names(x),1,3), 1:4)
+plot(pcX$x[,1:2],xlab=xlab,ylab=ylab, col=groupColors, 
+     main ="Principal components (PCA)")
+
+```
+Hacemos ahora clustering jerárquico para ver la agrupación esperada o también para ver si hay algún tipo de agrupación a descubrir.
+
+```{r custering, echo = FALSE}
+names(x) <- names2plot
+clust.euclid.average <- hclust(dist(t(x)),method="average")
+plot(clust.euclid.average, hang=-1)
 ```
 
 
 # Resultados
-Resultados
+
+En la exploración univariante se ve cierta simetría entre los dos grupos. De la exploración multivariante vemos que ni en el PCA ni en el clustering se puede ver una agrupación entre los dos grupos pero que hay otra agrupación que es consitente con el boxplot de la exploración univariante. 
 
 # Apéndices
 

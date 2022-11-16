@@ -1,12 +1,151 @@
 ---
-title: "PEC1_omicas_Lara_Kristjansdottir"
-author: "Lara Kristjansdottir"
-date: "2022-11-14"
-output: html_document
+title: "PEC1_Omicas"
+author: "Lára Kristjánsdóttir"
+output:
+  html_document:
+    code_folding: show
+    toc: true
+    toc_float:
+      toc_collapsed: yes
+    toc_depth: 3
+    theme: cosmo
+    highlight: textmate
+    number_sections: yes
+editor: 
+  markdown: 
+    wrap: 72
+self_contained: true
+
+# theme args should be one of: "default", "cerulean", "journal", "flatly", "darkly", "readable", "spacelab", "united", "cosmo", "lumen", "paper", "sandstone", "simplex", "yeti"
+
 ---
 
-```{r setup, include=FALSE}
+
+```{r setup, include=FALSE, echo = FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+```{r Libraries, echo = FALSE, include = FALSE}
+# Libraries
 
+library(BiocManager)
+library(GEOquery)
+```
+
+```{r, echo = FALSE, include = FALSE}
+
+
+# https://www.ncbi.nlm.nih.gov/sites/GDSbrowser?acc=GDS1736
+# https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE3737
+
+```
+
+
+# Introducción y objetivos
+En este trabajo haremos un  del dataset de "Arachidonic acid effect on prostate cancer cells. Determinaremos su estructura y el diseño del estudio que los generado, analisis exploratorio univariante y multivariante. 
+
+Hemos seleccionado el dataset ". Es un 
+Homo sapiens
+
+GEOserie GSE3737
+
+GEOdataset GDS1736
+
+## basic info del estudio
+Status 	Public on Jan 01, 2006
+Title 	Omega-6 fatty acids, arachidonic acid (AA) activates PI3K signaling and induces gene expression in prostate cancer
+Organism 	Homo sapiens
+
+gene chip analsisi
+
+
+summary: 
+Analysis of PC-3 prostate cancer cells incubated with arachidonic acid (AA). AA is an omega-6 fatty acid shown to induce cancer cell proliferation. Results suggest AA plays an important role in stimulation of growth-related genes and proliferation via phosphatidylinositol 3-kinase (PI3K) signaling.
+
+citation:     Hughes-Fulford M, Li CF, Boonyaratanakornkit J, Sayyah S. Arachidonic acid activates phosphatidylinositol 3-kinase signaling and induces gene expression in prostate cancer. Cancer Res 2006 Feb 1;66(3):1427-33. PMID: 16452198
+
+## estructura y diseño 
+
+
+Experiment type: 	Expression profiling by array
+
+Overall design: 	PC-3 prostate cancer cells were incubated with 5 µg/mL AA in RPMI containing 0.25 mg/mL albumin for 2hr. Control cells were treated with albumin alone and remained unactivated. Total RNA was isolated and relative gene expression was analyzed by Affymetrix gene arrays and then verified by qRTPCR. Microarrays for untreated and treated samples were done in quadruplicates. 
+
+# Métodos
+
+Empezamos descargando la información del experimento con `GEOquery` con la función `getGEO()`. 
+```{r, echo = FALSE}
+# Loading data with GEOquery
+
+gse <- getGEO("GSE3737", GSEMatrix=TRUE, AnnotGPL=TRUE) # a list, each of which elements is an expressionSet
+gds <- getGEO("GDS1736") # A class comprised of a metadata header and a GEODataTable
+```
+
+Veamos el objecto de "gse" y el Expression set que se crea automaticamente.
+```{r, echo = FALSE }
+# Información la lista gse3737
+
+class(gse)
+names(gse)
+length(gse)
+gse[[1]]
+esetFromGEO <- gse[[1]]
+
+```
+Veamos el objeto "gds" y creamos el Expression Set. 
+
+```{r, echo = FALSE}
+# Information on the gds class and turn gds class into expression set
+
+class(gds)
+slotNames(gds)
+eset <- GDS2eSet(gds,do.log2=FALSE)
+
+```
+Ahora exploramos el Expression set empezando con la información de los genes.
+```{r, echo = FALSE}
+# Information about the genes
+
+head(fData(eset)) 
+
+```
+Luego vemos los datos de la expresion genética y la información phenotípica. De la información phenotípica, puedemos por ejemplo ver a que grupo pertenece cada observación.
+```{r, echo = FALSE}
+# Gene expression data
+
+expression_matrix <- exprs(eset)
+head(expression_matrix) 
+```
+
+
+```{r, echo = FALSE}
+# phenotipic information
+
+head(pData(eset)) 
+```
+
+Exploramos la matriz de expresión para familiarizarnos con el dataset, viendo las dimesiones y los nombres de las columnas. 
+
+```{r, echo=TRUE}
+dim(expression_matrix)      # Dimensions
+colnames(expression_matrix)    # Vector of strings to name the columns
+```
+Ahora
+```{r}
+# summarizing  data
+
+```
+
+```{r}
+# visualizing dataset
+
+```
+
+
+# Resultados
+Resultados
+
+# Apéndices
+
+```{r ref.label=knitr::all_labels(), echo = T, eval = F}
+```

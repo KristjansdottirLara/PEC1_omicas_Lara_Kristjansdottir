@@ -102,19 +102,18 @@ slotNames(gds)
 eset <- GDS2eSet(gds,do.log2=FALSE)
 
 ```
-Ahora exploramos el Expression set empezando con la información de los genes.
+Ahora exploramos el Expression set. Empezamos con el viendo  con la información de los genes. ATH sjá hvad fData gerir!!
 ```{r, echo = FALSE}
 # Information about the genes
 
-head(fData(eset)) 
+colnames(fData(esetFromGEO))
 
 ```
 Luego vemos los datos de la expresion genética y la información phenotípica. De la información phenotípica, puedemos por ejemplo ver a que grupo pertenece cada observación.
 ```{r, echo = FALSE}
 # Gene expression data
 
-expression_matrix <- exprs(eset)
-head(expression_matrix) 
+head(exprs(eset)) 
 ```
 
 
@@ -127,6 +126,8 @@ head(pData(eset))
 Exploramos la matriz de expresión para familiarizarnos con el dataset, viendo las dimesiones y los nombres de las columnas. 
 
 ```{r, echo=TRUE}
+
+expression_matrix <- exprs(eset)
 dim(expression_matrix)      # Dimensions
 colnames(expression_matrix)    # Vector of strings to name the columns
 ```
